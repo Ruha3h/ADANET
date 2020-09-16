@@ -157,11 +157,11 @@ namespace ADANET_FRAMEWORK.Repos
 
             for (int i = 0; i < id.Length; i++)
             {
-                parameters[i] = string.Format("@Mass{0}", i);
+                parameters[i] = string.Format("@Age{0}", i);
             }
 
             var sql = @"DELETE FROM [dbo].[User] WHERE Id IN(" + string.Join(", ", parameters) + ")";
-
+            Console.WriteLine(sql);
             using (var connection = new SqlConnection(this.connString))
             {
                 connection.Open();
@@ -172,7 +172,7 @@ namespace ADANET_FRAMEWORK.Repos
                         command.Parameters.AddWithValue(parameters[i],id[i]);
                     }
                     if (command.ExecuteNonQuery() == 0)
-                        throw new Exception("User was not deleted");
+                        throw new Exception("Users was not deleted");
                 }
             }
         }
