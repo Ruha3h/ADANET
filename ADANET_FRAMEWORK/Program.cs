@@ -9,31 +9,58 @@ using System.Threading.Tasks;
 
 namespace ADANET_FRAMEWORK
 {
-   class Program
-   {
-      static void Main(string[] args)
-      {
-         var connectionString = ConfigurationManager.ConnectionStrings["Default"].ConnectionString;
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var connectionString = ConfigurationManager.ConnectionStrings["Default"].ConnectionString;
 
-         var repo = new UserRepo(connectionString);
+            var repo = new UserRepo(connectionString);
 
-         var id = repo.Create(new User
-         {
-            Name = "Nikolay",
-            Age = 24
-         });
+            repo.DeleteAll();
 
-         Console.WriteLine(repo.Read(id));
+            var id = repo.Create(new User
+            {
+                Name = "Nikolay",
+                Age = 24
+            });
 
-         repo.Update(id, new User
-         {
-            Name = "John Doe",
-            Age = 25
-         });
+            Console.WriteLine(repo.Read(id));
 
-         Console.WriteLine(repo.Read(id));
+            id = repo.Create(new User
+            {
+                Name = "asdasd",
+                Age = 25
+            });
 
-         repo.Delete(id);
-      }
-   }
+            Console.WriteLine(repo.Read(id));
+            id = repo.Create(new User
+            {
+                Name = "fghfgh",
+                Age = 25
+            });
+
+            Console.WriteLine(repo.Read(id));
+            id = repo.Create(new User
+            {
+                Name = "werwer",
+                Age = 25
+            });
+
+            Console.WriteLine(repo.Read(id));
+            id = repo.Create(new User
+            {
+                Name = "cvbcvbcbv",
+                Age = 25
+            });
+
+            Console.WriteLine(repo.Read(id));
+
+            Console.WriteLine("Press Any Key...");
+            Console.ReadKey();
+
+            repo.DeleteByMass(new int[]{1,3,5 });
+
+        }
+    }
 }

@@ -4,18 +4,22 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace ADANET_FRAMEWORK.Repos {
-   public class UserRepo {
-      private readonly string connString;
+namespace ADANET_FRAMEWORK.Repos
+{
+    public class UserRepo
+    {
+        private readonly string connString;
 
-      public UserRepo(string connString) {
-         this.connString = connString;
-      }
+        public UserRepo(string connString)
+        {
+            this.connString = connString;
+        }
 
-      public int Create(User user) {
+        public int Create(User user)
+        {
 
-         // SQL Expression
-         var sql = @"INSERT INTO [dbo].[User]
+            // SQL Expression
+            var sql = @"INSERT INTO [dbo].[User]
                                 ([Name]
                                 ,[Age])
                           VALUES
@@ -23,127 +27,154 @@ namespace ADANET_FRAMEWORK.Repos {
                                 ,@Age);
                      SET @id=SCOPE_IDENTITY()";
 
-         // Creating connection and opening
-         using (var connection = new SqlConnection(this.connString)) {
-            connection.Open();
-
-            // command creating
-            using (var command = new SqlCommand(sql, connection)) {
-
-               #region Adding parameters
-               #region InputParams
-               var nameParam = new SqlParameter("@Name", user.Name);
-
-               command.Parameters.Add(nameParam);
-
-
-               command.Parameters.AddWithValue("@Age", user.Age); 
-               #endregion
-
-               #region OutputParam
-               var idParam = new SqlParameter {
-                  ParameterName = "@id",
-                  SqlDbType = System.Data.SqlDbType.Int,
-                  Direction = System.Data.ParameterDirection.Output
-               };
-
-               command.Parameters.Add(idParam);
-               #endregion
-
-               #endregion
-
-               if (command.ExecuteNonQuery() == 0)
-                  throw new Exception("User was not inserted");
-               else
-                  return Convert.ToInt32(idParam.Value);
-            }
-         }
-      }
-
-      public User Read(int id)
-      {
-         var sql = @"SELECT * FROM [dbo].[User] WHERE Id = @Id";
-
-         using (var connection = new SqlConnection(this.connString))
-         {
-            connection.Open();
-            using (var command = new SqlCommand(sql, connection))
+            // Creating connection and opening
+            using (var connection = new SqlConnection(this.connString))
             {
-               command.Parameters.AddWithValue("@Id", id);
+                connection.Open();
 
-               using (var reader = command.ExecuteReader())
-               {
-                  reader.Read();
+                // command creating
+                using (var command = new SqlCommand(sql, connection))
+                {
 
-                  return new User
-                  {
-                     Id = Convert.ToInt32(reader["Id"]),
-                     Name = reader["Name"].ToString(),
-                     Age = Convert.ToInt32(reader["Age"])
-                  };
-               }
+                    #region Adding parameters
+                    #region InputParams
+                    var nameParam = new SqlParameter("@Name", user.Name);
+
+                    command.Parameters.Add(nameParam);
+
+
+                    command.Parameters.AddWithValue("@Age", user.Age);
+                    #endregion
+
+                    #region OutputParam
+                    var idParam = new SqlParameter
+                    {
+                        ParameterName = "@id",
+                        SqlDbType = System.Data.SqlDbType.Int,
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+
+                    command.Parameters.Add(idParam);
+                    #endregion
+
+                    #endregion
+
+                    if (command.ExecuteNonQuery() == 0)
+                        throw new Exception("User was not inserted");
+                    else
+                        return Convert.ToInt32(idParam.Value);
+                }
             }
-         }
-      }
+        }
 
-      public void Update(int id, User user)
-      {
-         var sql = @"UPDATE [dbo].[User] SET [Name] = @Name, [Age] = @Age WHERE Id = @Id";
+        public User Read(int id)
+        {
+            var sql = @"SELECT * FROM [dbo].[User] WHERE Id = @Id";
 
-         using (var connection = new SqlConnection(this.connString))
-         {
-            connection.Open();
-
-            using (var command = new SqlCommand(sql, connection))
+            using (var connection = new SqlConnection(this.connString))
             {
-               command.Parameters.AddWithValue("@Id", id);
-               command.Parameters.AddWithValue("@Name", user.Name);
-               command.Parameters.AddWithValue("@Age", user.Age);
+                connection.Open();
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
 
-               command.ExecuteNonQuery();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        reader.Read();
+
+                        return new User
+                        {
+                            Id = Convert.ToInt32(reader["Id"]),
+                            Name = reader["Name"].ToString(),
+                            Age = Convert.ToInt32(reader["Age"])
+                        };
+                    }
+                }
             }
-         }
-      }
+        }
 
-      public void Delete(int id)
-      {
-         var sql = @"DELETE FROM [dbo].[User]
+        public void Update(int id, User user)
+        {
+            var sql = @"UPDATE [dbo].[User] SET [Name] = @Name, [Age] = @Age WHERE Id = @Id";
+
+            using (var connection = new SqlConnection(this.connString))
+            {
+                connection.Open();
+
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+                    command.Parameters.AddWithValue("@Name", user.Name);
+                    command.Parameters.AddWithValue("@Age", user.Age);
+
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void Delete(int id)
+        {
+            var sql = @"DELETE FROM [dbo].[User]
                      WHERE Id = @Id";
 
-         using (var connection = new SqlConnection(this.connString))
-         {
-            connection.Open();
-            using (var command = new SqlCommand(sql, connection))
+            using (var connection = new SqlConnection(this.connString))
             {
-               command.Parameters.AddWithValue("@Id", id);
-
-               if (command.ExecuteNonQuery() == 0)
-                  throw new Exception("User was not deleted");
-            }
-         }
-      }
-      public void DeleteByMass(int[] id)
-      {
-         var sql = @"DELETE FROM [dbo].[User] WHERE Id IN(@Mass)";
-        
-         var parameters = new string[id.Length];
-        
-
-         using (var connection = new SqlConnection(this.connString))
-         {
-            connection.Open();
-            using (var command = new SqlCommand(sql, connection))
-            {
-                for (int i = 0; i < id.Length; i++)
+                connection.Open();
+                using (var command = new SqlCommand(sql, connection))
                 {
-                    parameters[i] = string.Format("@Mass{0}", i);
-                    command.Parameters.AddWithValue(parameters[i], id[i]);
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    if (command.ExecuteNonQuery() == 0)
+                        throw new Exception("User was not deleted");
                 }
-                command.Parameters.AddWithValue("@Mass", string.Join(", ", parameters));
-                if (command.ExecuteNonQuery() == 0)
-                    throw new Exception("User was not deleted");
             }
-         }
-      }
-   }
+        }
+        public void DeleteAll()
+        {
+            var sql = @"DELETE FROM [dbo].[User]";
+
+            using (var connection = new SqlConnection(this.connString))
+            {
+                connection.Open();
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    if (command.ExecuteNonQuery() == 0)
+                        throw new Exception("User was not deleted");
+                }
+
+                using (var command = new SqlCommand("DBCC CHECKIDENT('[User]', RESEED, 0)", connection))
+                {
+                    if (command.ExecuteNonQuery() == 0)
+                        throw new Exception("User was not deleted");
+                }
+
+            }
+        }
+        public void DeleteByMass(int[] id)
+        {
+
+            var parameters = new string[id.Length];
+
+            for (int i = 0; i < id.Length; i++)
+            {
+                parameters[i] = string.Format("@Mass{0}", i);
+            }
+
+            var sql = @"DELETE FROM [dbo].[User] WHERE Id IN(" + string.Join(", ", parameters) + ")";
+
+            using (var connection = new SqlConnection(this.connString))
+            {
+                connection.Open();
+                using (var command = new SqlCommand(sql, connection))
+                {
+                    for (int i = 0; i < id.Length; i++)
+                    {
+                        command.Parameters.AddWithValue(parameters[i],id[i]);
+                    }
+                    if (command.ExecuteNonQuery() == 0)
+                        throw new Exception("User was not deleted");
+                }
+            }
+        }
+    }
 }
